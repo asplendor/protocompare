@@ -45,7 +45,7 @@ export default function EditorView() {
   ].join(' ');
 
   return (
-    <div className="flex flex-col h-screen" style={{ background: 'var(--color-bg)' }}>
+    <div className="flex flex-col flex-1 min-h-0" style={{ background: 'var(--color-bg)' }}>
       {/* Small screen banner — non-blocking */}
       {isSmallScreen && (
         <div
@@ -70,6 +70,26 @@ export default function EditorView() {
           )
         }
       />
+
+      {/* Hero + how it works — only when not fullscreen */}
+      {!isFullscreen && (
+        <>
+          <section className="text-center py-6 shrink-0">
+            <h1 className="text-2xl font-semibold" style={{ color: '#f1f5f9' }}>
+              Compare two HTML prototypes side by side.
+            </h1>
+            <p className="text-base mt-1" style={{ color: '#64748b' }}>
+              Feedback faster.
+            </p>
+          </section>
+          <div
+            className="text-center text-xs shrink-0 pb-3"
+            style={{ color: '#64748b' }}
+          >
+            ① Upload or paste HTML → ② Compare side by side → ③ Share a link
+          </div>
+        </>
+      )}
 
       {/* Main panes */}
       <div className="flex flex-1 min-h-0" style={{ borderColor: 'var(--color-border)' }}>

@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Loader2, Layers } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchComparison, type Comparison } from '../utils/supabase';
 import PrototypeViewer from '../components/PrototypeViewer';
 import Header from '../components/Header';
 
-type LoadState = 'loading' | 'loaded' | 'expired' | 'error';
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+type LoadState = 'loading' | 'loaded' | 'expired' | 'notfound';
 
 export default function SharedView() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [comparison, setComparison] = useState<Comparison | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [fullscreenSide, setFullscreenSide] = useState<'left' | 'right' | null>(null);
@@ -23,7 +24,7 @@ export default function SharedView() {
 
   useEffect(() => {
     if (!id) {
-      setLoadState('error');
+      setLoadState('notfound');
       return;
     }
     fetchComparison(id)
@@ -32,8 +33,7 @@ export default function SharedView() {
         setLoadState('loaded');
       })
       .catch(() => {
-        // Either expired (filtered by RLS) or genuinely not found
-        setLoadState('expired');
+        setLoadState(UUID_REGEX.test(id) ? 'expired' : 'notfound');
       });
   }, [id]);
 
@@ -61,42 +61,77 @@ export default function SharedView() {
   if (loadState === 'loading') {
     return (
       <div
-        className="flex items-center justify-center h-screen gap-3"
-        style={{ background: 'var(--color-bg)', color: 'var(--color-text-secondary)' }}
+        className="flex flex-col min-h-screen"
+        style={{ background: 'var(--color-bg)' }}
       >
-        <Loader2 size={20} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
-        <span className="text-sm">Loading comparison…</span>
+        <p
+          className="text-center py-4 text-sm shrink-0"
+          style={{ color: '#64748b' }}
+        >
+          Loading comparison…
+        </p>
+        <div className="flex flex-1 min-h-0">
+          <div
+            className="w-1/2 border-r animate-pulse"
+            style={{ background: '#1e293b', borderColor: 'var(--color-border)' }}
+          />
+          <div
+            className="w-1/2 animate-pulse"
+            style={{ background: '#1e293b' }}
+          />
+        </div>
       </div>
     );
   }
 
-  // ── Expired / Not found ──
-  if (loadState === 'expired' || loadState === 'error') {
+  // ── Expired ──
+  if (loadState === 'expired') {
     return (
       <div
-        className="flex flex-col items-center justify-center h-screen gap-6 px-4 text-center"
+        className="flex flex-col items-center justify-center min-h-screen gap-6 px-4 text-center"
         style={{ background: 'var(--color-bg)' }}
       >
-        <div className="flex items-center gap-2 mb-2">
-          <Layers size={22} style={{ color: 'var(--color-primary)' }} />
-          <span className="font-semibold text-base" style={{ color: 'var(--color-text)' }}>
-            ProtoCompare
-          </span>
-        </div>
         <div className="space-y-2 max-w-sm">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>
+          <h1 className="text-xl font-semibold" style={{ color: '#f1f5f9' }}>
             This comparison has expired
           </h1>
-          <p style={{ color: 'var(--color-text-secondary)' }} className="text-sm">
-            ProtoCompare links last 5 days. This one is no longer available.
+          <p className="text-sm" style={{ color: '#64748b' }}>
+            ProtoCompare links are active for 5 days.
           </p>
         </div>
-        <Link
-          to="/"
-          className="btn-primary inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm"
+        <button
+          onClick={() => navigate('/')}
+          className="rounded-lg px-5 py-2.5 text-sm font-medium transition-colors"
+          style={{ background: '#14b8a6', color: '#0f172a' }}
         >
           Create a new comparison →
-        </Link>
+        </button>
+      </div>
+    );
+  }
+
+  // ── Not found ──
+  if (loadState === 'notfound') {
+    return (
+      <div
+        className="flex flex-col items-center justify-center min-h-screen gap-6 px-4 text-center"
+        style={{ background: 'var(--color-bg)' }}
+      >
+        <div className="space-y-2 max-w-sm">
+          <h1 className="text-xl font-semibold" style={{ color: '#f1f5f9' }}>
+            Comparison not found
+          </h1>
+          <p className="text-sm" style={{ color: '#64748b' }}>
+            This link may be incorrect or no longer exists.
+          </p>
+        </div>
+        <button
+          onClick={() => navigate('/')}
+          className="rounded-lg px-5 py-2.5 text-sm font-medium transition-colors"
+          style={{ background: '#14b8a6', color: '#0f172a' }}
+        >
+          Create a new comparison →
+        </button>
       </div>
     );
   }
@@ -106,7 +141,7 @@ export default function SharedView() {
   const right = comparison?.right_html ?? null;
 
   return (
-    <div className="flex flex-col h-screen" style={{ background: 'var(--color-bg)' }}>
+    <div className="flex flex-col flex-1 min-h-0" style={{ background: 'var(--color-bg)' }}>
       {/* Small screen banner */}
       {isSmallScreen && (
         <div

@@ -15,6 +15,8 @@ export default function PrototypeViewer({
   onExpand,
   onCollapse,
 }: PrototypeViewerProps) {
+  const hasContent = typeof html === 'string' && html.trim().length > 0;
+
   return (
     <div className="relative w-full h-full flex flex-col">
       {/* Toolbar strip */}
@@ -44,14 +46,24 @@ export default function PrototypeViewer({
         </button>
       </div>
 
-      {/* iframe — srcDoc renders HTML directly, no transpilation */}
-      <iframe
-        srcDoc={html}
-        sandbox="allow-scripts allow-forms allow-popups"
-        title={`${side} prototype preview`}
-        className="flex-1 w-full border-0"
-        style={{ display: 'block' }}
-      />
+      {hasContent ? (
+        <iframe
+          srcDoc={html}
+          sandbox="allow-scripts allow-forms allow-popups"
+          title={`${side} prototype preview`}
+          className="flex-1 w-full border-0"
+          style={{ display: 'block' }}
+        />
+      ) : (
+        <div
+          className="flex-1 flex items-center justify-center border-2 border-dashed min-h-0"
+          style={{ borderColor: '#334155' }}
+        >
+          <p className="text-sm" style={{ color: '#64748b' }}>
+            Drop your first HTML prototype here
+          </p>
+        </div>
+      )}
     </div>
   );
 }
