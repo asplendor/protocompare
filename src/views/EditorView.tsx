@@ -71,8 +71,8 @@ export default function EditorView() {
         }
       />
 
-      {/* Hero + how it works — only when not fullscreen */}
-      {!isFullscreen && (
+      {/* Hero + how it works — only when not fullscreen; collapse based on content */}
+      {!isFullscreen && !leftHTML && !rightHTML && (
         <>
           <section className="text-center py-6 shrink-0">
             <h1 className="text-2xl font-semibold" style={{ color: '#f1f5f9' }}>
@@ -89,6 +89,14 @@ export default function EditorView() {
             ① Upload or paste HTML → ② Compare side by side → ③ Share a link
           </div>
         </>
+      )}
+      {!isFullscreen && (!!leftHTML !== !!rightHTML) && (
+        <div
+          className="text-center text-xs shrink-0 pb-3"
+          style={{ color: '#64748b' }}
+        >
+          ① Upload or paste HTML → ② Compare side by side → ③ Share a link
+        </div>
       )}
 
       {/* Main panes */}
@@ -116,7 +124,10 @@ export default function EditorView() {
         </div>
 
         {/* RIGHT PANE */}
-        <div className={rightPaneClass}>
+        <div
+          className={rightPaneClass}
+          style={fullscreenSide === 'right' ? { marginLeft: 'auto' } : undefined}
+        >
           {rightHTML ? (
             <PrototypeViewer
               html={rightHTML}
