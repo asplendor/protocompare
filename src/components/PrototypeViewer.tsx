@@ -3,6 +3,7 @@ import { Maximize2, Minimize2 } from 'lucide-react';
 interface PrototypeViewerProps {
   html: string;
   side: 'Left' | 'Right';
+  zoom?: number;
   isFullscreen: boolean;
   onExpand: () => void;
   onCollapse: () => void;
@@ -11,11 +12,14 @@ interface PrototypeViewerProps {
 export default function PrototypeViewer({
   html,
   side,
+  zoom = 100,
   isFullscreen,
   onExpand,
   onCollapse,
 }: PrototypeViewerProps) {
   const hasContent = typeof html === 'string' && html.trim().length > 0;
+  const scale = zoom / 100;
+  const wrapperHeightPercent = 100 / scale;
 
   return (
     <div className="relative w-full h-full flex flex-col">
@@ -47,13 +51,24 @@ export default function PrototypeViewer({
       </div>
 
       {hasContent ? (
-        <iframe
-          srcDoc={html}
-          sandbox="allow-scripts allow-forms allow-popups"
-          title={`${side} prototype preview`}
-          className="flex-1 w-full border-0"
-          style={{ display: 'block' }}
-        />
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <div
+            style={{
+              height: `${wrapperHeightPercent}%`,
+              transform: `scale(${scale})`,
+              transformOrigin: 'top left',
+              width: `${wrapperHeightPercent}%`,
+            }}
+          >
+            <iframe
+              srcDoc={html}
+              sandbox="allow-scripts allow-forms allow-popups"
+              title={`${side} prototype preview`}
+              className="w-full border-0 block"
+              style={{ height: '100%' }}
+            />
+          </div>
+        </div>
       ) : (
         <div
           className="flex-1 flex items-center justify-center border-2 border-dashed min-h-0"

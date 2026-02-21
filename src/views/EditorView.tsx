@@ -14,6 +14,7 @@ export default function EditorView() {
   const [openModal, setOpenModal] = useState<Side | null>(null);
   const [fullscreenSide, setFullscreenSide] = useState<FullscreenSide>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [zoom, setZoom] = useState(100);
 
   // Detect small screens (below 900px) for banner
   useEffect(() => {
@@ -110,6 +111,7 @@ export default function EditorView() {
             <PrototypeViewer
               html={leftHTML}
               side="Left"
+              zoom={zoom}
               isFullscreen={fullscreenSide === 'left'}
               onExpand={() => setFullscreenSide('left')}
               onCollapse={() => setFullscreenSide(null)}
@@ -132,6 +134,7 @@ export default function EditorView() {
             <PrototypeViewer
               html={rightHTML}
               side="Right"
+              zoom={zoom}
               isFullscreen={fullscreenSide === 'right'}
               onExpand={() => setFullscreenSide('right')}
               onCollapse={() => setFullscreenSide(null)}
@@ -149,26 +152,53 @@ export default function EditorView() {
       {/* Footer toolbar */}
       {!isFullscreen && (
         <footer
-          className="flex items-center justify-center gap-3 px-5 py-3 border-t shrink-0"
+          className="flex items-center gap-3 px-5 py-3 border-t shrink-0"
           style={{
             background: 'var(--color-surface)',
             borderColor: 'var(--color-border)',
           }}
         >
-          <LoadButton
-            side="Left"
-            hasContent={!!leftHTML}
-            onClick={() => setOpenModal('left')}
-          />
-          <div
-            className="w-px h-5"
-            style={{ background: 'var(--color-border)' }}
-          />
-          <LoadButton
-            side="Right"
-            hasContent={!!rightHTML}
-            onClick={() => setOpenModal('right')}
-          />
+          {(leftHTML || rightHTML) && (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                aria-label="Zoom out"
+                disabled={zoom <= 50}
+                onClick={() => setZoom((z) => Math.max(50, z - 10))}
+                className="flex items-center justify-center px-3 py-1.5 rounded-lg text-sm transition-colors btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                −
+              </button>
+              <span className="px-2 text-sm min-w-[3ch]" style={{ color: 'var(--color-text-secondary)' }}>
+                {zoom}%
+              </span>
+              <button
+                type="button"
+                aria-label="Zoom in"
+                disabled={zoom >= 150}
+                onClick={() => setZoom((z) => Math.min(150, z + 10))}
+                className="flex items-center justify-center px-3 py-1.5 rounded-lg text-sm transition-colors btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                +
+              </button>
+            </div>
+          )}
+          <div className="flex-1 flex items-center justify-center gap-3">
+            <LoadButton
+              side="Left"
+              hasContent={!!leftHTML}
+              onClick={() => setOpenModal('left')}
+            />
+            <div
+              className="w-px h-5"
+              style={{ background: 'var(--color-border)' }}
+            />
+            <LoadButton
+              side="Right"
+              hasContent={!!rightHTML}
+              onClick={() => setOpenModal('right')}
+            />
+          </div>
         </footer>
       )}
 

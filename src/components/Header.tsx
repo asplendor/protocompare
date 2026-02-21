@@ -29,7 +29,7 @@ export default function Header({ rightSlot, fullscreenMode, onExitFullscreen }: 
         <div className="flex items-center gap-2">
           <Layers size={20} style={{ color: 'var(--color-primary)' }} />
           <span className="font-semibold tracking-tight text-base" style={{ color: 'var(--color-text)' }}>
-            ProtoCompare<sup className="text-xs align-super" style={{ marginLeft: '-3px' }}>™</sup>
+            ProtoCompare<span className="text-[10px] align-top leading-none relative top-[2px] ml-[1px] opacity-70">™</span>
           </span>
         </div>
       )}
