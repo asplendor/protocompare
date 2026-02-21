@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #14b8a6;   /* jade */
+  --color-accent: #06b6d4;    /* aquamarine */
+  --color-bg: #0f172a;        /* slate-950 */
+  --color-surface: #1e293b;   /* slate-800 */
+  --color-text: #f1f5f9;      /* slate-100 */
+  --color-text-secondary: #cbd5e1; /* slate-300 */
+  --color-border: #334155;    /* slate-700 */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth transitions for layout changes (fullscreen toggle) */
+.pane-transition {
+  transition: width 0.2s ease, opacity 0.2s ease;
+}
+
+/* Custom scrollbar — subtle */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* Accent glow utility for buttons */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #0f172a;
+  font-weight: 600;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-accent);
+  box-shadow: 0 0 12px rgba(20, 184, 166, 0.35);
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Ghost button */
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.btn-ghost:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
