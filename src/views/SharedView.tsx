@@ -14,6 +14,7 @@ export default function SharedView() {
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [fullscreenSide, setFullscreenSide] = useState<'left' | 'right' | null>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [zoom, setZoom] = useState(100);
 
   useEffect(() => {
     const check = () => setIsSmallScreen(window.innerWidth < 900);
@@ -173,6 +174,7 @@ export default function SharedView() {
             <PrototypeViewer
               html={left}
               side="Left"
+              zoom={zoom}
               isFullscreen={fullscreenSide === 'left'}
               onExpand={() => setFullscreenSide('left')}
               onCollapse={() => setFullscreenSide(null)}
@@ -194,6 +196,7 @@ export default function SharedView() {
             <PrototypeViewer
               html={right}
               side="Right"
+              zoom={zoom}
               isFullscreen={fullscreenSide === 'right'}
               onExpand={() => setFullscreenSide('right')}
               onCollapse={() => setFullscreenSide(null)}
@@ -209,6 +212,41 @@ export default function SharedView() {
           )}
         </div>
       </div>
+
+      {/* Bottom toolbar — zoom only, when at least one pane has content and not fullscreen */}
+      {!isFullscreen && (left || right) && (
+        <footer
+          className="flex items-center gap-3 px-5 py-3 border-t shrink-0"
+          style={{
+            background: 'var(--color-surface)',
+            borderColor: 'var(--color-border)',
+          }}
+        >
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              aria-label="Zoom out"
+              disabled={zoom <= 50}
+              onClick={() => setZoom((z) => Math.max(50, z - 10))}
+              className="flex items-center justify-center px-3 py-1.5 rounded-lg text-sm transition-colors btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              −
+            </button>
+            <span className="px-2 text-sm min-w-[3ch]" style={{ color: 'var(--color-text-secondary)' }}>
+              {zoom}%
+            </span>
+            <button
+              type="button"
+              aria-label="Zoom in"
+              disabled={zoom >= 150}
+              onClick={() => setZoom((z) => Math.min(150, z + 10))}
+              className="flex items-center justify-center px-3 py-1.5 rounded-lg text-sm transition-colors btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              +
+            </button>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }
